@@ -1,14 +1,25 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+
+// Zodスキーマの定義
+const schema = z.object({
+  name: z.string().min(1, { message: '名前は必須です' }),
+  email: z.string().email({ message: '有効なメールアドレスを入力してください' }),
+})
+
+type FormData = z.infer<typeof schema>
 
 export default function SendPage() {
   const [status, setStatus] = useState<string>('')
-  const [name, setName] = useState<string>('')
-  const [email, setEmail] = useState<string>('')
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  })
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const onSubmit = async (data: FormData) => {
     setStatus('送信中...')
     try {
       const response = await fetch('/api/send', {
@@ -16,7 +27,7 @@ export default function SendPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify(data),
       })
 
       if (response.ok) {
@@ -32,25 +43,21 @@ export default function SendPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <form onSubmit={handleSubmit} className="flex flex-col items-center">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-center">
         <input
-          type="text"
-          name="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          {...register('name')}
           placeholder="名前"
-          className="px-4 py-2 text-slate-950 border border-gray-300 rounded mb-4"
-          required
+          className="px-4 py-2 text-slate-950 border border-gray-300 rounded mb-1"
         />
+        {errors.name && <p className="text-red-500 mb-4">{errors.name.message}</p>}
+        
         <input
-          type="email"
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          {...register('email')}
           placeholder="メールアドレス"
-          className="px-4 py-2 text-slate-950 border border-gray-300 rounded mb-4"
-          required
+          className="px-4 py-2 text-slate-950 border border-gray-300 rounded mb-1"
         />
+        {errors.email && <p className="text-red-500 mb-4">{errors.email.message}</p>}
+        
         <button 
           type="submit"
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
