@@ -6,10 +6,10 @@ export default function Home() {
       <h1>My Next.js App with CloudFront Images</h1>
       <div className="w-64 h-auto">
         <CloudFrontImage
-            imageKey="pngtree-dunk-master-picture-png-image_7389035.png"
+            imageKey="git.png"
         />
         <CloudFrontImage
-            imageKey="image827053908l.png"
+            imageKey="pngtree-dunk-master-picture-png-image_7389035.png"
         />
       </div>
     </div>
