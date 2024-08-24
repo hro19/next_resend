@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
   try {
     const command = new GetObjectCommand({
-      Bucket: "wada55",
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,
     });
 
